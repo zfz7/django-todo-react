@@ -23,4 +23,4 @@ class GenerateTextView(views.APIView):
             return Response({"error": "Prompt is required"}, status=status.HTTP_400_BAD_REQUEST)
         
         generated_text = generate_text(prompt)
-        return Response({"generated_text": generated_text}, status=status.HTTP_200_OK)
+        return Response({"data": generated_text}, status=status.HTTP_200_OK)

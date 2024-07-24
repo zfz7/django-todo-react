@@ -5,6 +5,7 @@ openai.api_key = settings.OPENAI_API_KEY
 client = openai.OpenAI()
 
 def generate_text(prompt):
+
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
@@ -12,4 +13,5 @@ def generate_text(prompt):
             {"role": "user", "content": "The tasks are: " + prompt}
         ]
     )   
-    return response.choices[0].text.strip()
+    return response.choices[0].message.content.strip()
+    

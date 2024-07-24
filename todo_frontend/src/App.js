@@ -14,6 +14,8 @@ class App extends Component {
         description: "",
         completed: false,
       },
+      message: "",
+      response: "",
     };
   }
 
@@ -45,6 +47,18 @@ class App extends Component {
       .post("/api/tasks/", item)
       .then((res) => this.refreshList());
   };
+
+  handleChatSubmit = (e) => {
+    e.preventDefault();
+
+    try {
+      axios
+        .post('http://127.0.0.1:8000/api/generate-text/', { prompt: this.state.message })
+        .then((res) => this.setState({ response: res.data["data"] }));
+    } catch (error) {
+      console.error('Error chatting with GPT:', error);
+    }
+  };  
 
   handleDelete = (item) => {
     axios
@@ -129,7 +143,7 @@ class App extends Component {
   render() {
     return (
       <main className="container">
-        <h1 className="text-white text-uppercase text-center my-4">Todo app</h1>
+        <h1 className="text-uppercase text-center my-4">Todo app</h1>
         <div className="row">
           <div className="col-md-6 col-sm-10 mx-auto p-0">
             <div className="card p-3">
@@ -155,6 +169,25 @@ class App extends Component {
             onSave={this.handleSubmit}
           />
         ) : null}
+        <div className="row text-center">
+          <h2>Summarize tasks with GPT</h2>
+          <form onSubmit={this.handleChatSubmit}>
+            <textarea
+              value={this.state.message}
+              onChange={(e) => this.setState({ message: e.target.value })}
+              rows="4"
+              cols="50"
+            />
+            <br/>
+            <button className="btn btn-primary" type="submit">Send</button>
+          </form>
+          {this.state.response && (
+            <div>
+              <h2>Response:</h2>
+              <p>{this.state.response}</p>
+            </div>
+          )}
+        </div>        
       </main>
     );
   }
