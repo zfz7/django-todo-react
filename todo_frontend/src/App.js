@@ -3,12 +3,15 @@ import {CustomModal} from "./components/Modal";
 import axios from "axios";
 
 function App() {
+  const [language, setLangauge] = useState("Chinese")
+  const [isLoading, setIsLoading] = useState(true)
   const [state, setState] = useState({
     viewCompleted: false,
     todoList: [],
     modal: false,
     activeItem: {
       title: "",
+      translatedTitle: "",
       description: "",
       completed: false,
     },
@@ -18,12 +21,14 @@ function App() {
 
   useEffect(() => {
     refreshList();
-  }, [])
+  }, [language])
 
   const refreshList = () => {
+    setIsLoading(true)
     axios
-      .get("/api/tasks/")
+      .get(`/api/tasks?language=${language}`)
       .then((res) => setState(prev => ({...prev, todoList: res.data})))
+      .then(() => setIsLoading(false))
       .catch((err) => console.log(err));
   }
 
@@ -114,6 +119,7 @@ function App() {
         >
           {item.title}
         </span>
+        {item.translatedTitle && <span>{item.translatedTitle}</span>}
         <span>
           <button
             className="btn btn-secondary mr-2"
@@ -146,10 +152,23 @@ function App() {
                 Add task
               </button>
             </div>
+            <div className="mb-4">
+              <select class="form-control" value={language} onChange={(e) => setLangauge(e.target.value)}>
+                <option value="Chinese">Chinese</option>
+                <option value="Russian">Russian</option>
+                <option value="Spanish">Spanish</option>
+              </select>
+            </div>
             {renderTabList()}
-            <ul className="list-group list-group-flush border-top-0">
-              {renderItems()}
-            </ul>
+            {isLoading ? <div className="d-flex justify-content-center align-items-center" style={{height: '20vh'}}>
+                <div className="spinner-border" role="status">
+                  <span className="visually-hidden">Loading...</span>
+                </div>
+              </div> :
+              <ul className="list-group list-group-flush border-top-0">
+                {renderItems()}
+              </ul>
+            }
           </div>
         </div>
       </div>
